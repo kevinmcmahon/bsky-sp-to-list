@@ -1,23 +1,23 @@
 {
     "manifest_version": 3,
-    "name": "Starter Pack to Feed Extension",
+    "name": "Bluesky Starter Pack to List",
     "version": "1.0",
-    "description": "Add the ability to convert a starter pack into a feed.",
-    "permissions": ["tabs", "activeTab", "webNavigation", "scripting"],
-    "host_permissions": ["*://*.bsky.app/*"],
+    "description": "Add the ability to convert a starter pack into a list.",
+    "permissions": ["tabs", "activeTab", "webNavigation", "scripting", "identity"],
+    "host_permissions": ["*://*.bsky.app/*", "https://public.api.bsky.app/*"],
     "background": {
-        "service_worker": "scripts/background.js",
+        "service_worker": "background.js",
         "type": "module"
     },
     "content_scripts": [
         {
-            "matches": ["*://*.bsky.app/starter-pack*"],
-            "js": ["scripts/content.js"]
+            "matches": ["*://*.bsky.app/starter-pack*", "*://*.bsky.app/start/*"],
+            "js": ["content.js"]
         }
     ],
     "web_accessible_resources": [
         {
-            "resources": ["scripts/*"],
+            "resources": ["*"],
             "matches": ["*://*.bsky.app/*"]
         }
     ],

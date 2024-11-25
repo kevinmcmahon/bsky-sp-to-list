@@ -1,0 +1,30 @@
+{
+    "name": "bsky-sp-to-list",
+    "version": "0.0.1",
+    "description": "A Chrome extension that lets you turn a starter pack into a list",
+    "main": "index.js",
+    "repository": "https://github.com/kevinmcmahon/bsky-sp-to-list",
+    "author": "Kevin McMahon <kevinmcmahon@users.noreply.github.com>",
+    "license": "MIT",
+    "scripts": {
+        "build": "webpack --config webpack.config.js",
+        "watch": "webpack --config webpack.config.js --watch"
+    },
+    "dependencies": {
+        "@atproto/api": "^0.13.17",
+        "@atproto/oauth-client-browser": "^0.3.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.26.0",
+        "@babel/preset-env": "^7.26.0",
+        "babel-loader": "^9.2.1",
+        "copy-webpack-plugin": "^12.0.2",
+        "css-loader": "^7.1.2",
+        "dotenv-webpack": "^8.1.0",
+        "html-loader": "^5.1.0",
+        "html-webpack-plugin": "^5.6.3",
+        "style-loader": "^4.0.0",
+        "webpack": "^5.96.1",
+        "webpack-cli": "^5.1.4"
+    }
+}
