@@ -3,7 +3,7 @@
     "name": "Bluesky Starter Pack to List",
     "version": "1.0",
     "description": "Add the ability to convert a starter pack into a list.",
-    "permissions": ["tabs", "activeTab", "webNavigation", "scripting", "identity"],
+    "permissions": ["tabs", "activeTab", "webNavigation", "scripting", "identity", "storage"],
     "host_permissions": ["*://*.bsky.app/*", "https://public.api.bsky.app/*"],
     "background": {
         "service_worker": "background.js",

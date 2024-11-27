@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Starter Pack to List Extension</title>
-        <link rel="stylesheet" type="text/css" href="styles/popup.css" />
+        <title>Starter Pack to List Converter</title>
     </head>
     <body>
-        <div id="app">
-            <h1>Starter Pack to List Extension</h1>
-            <p>This is my awesome extension!</p>
+        <div class="app">
+            <h1>Starter Pack to List Converter</h1>
+
+            <p id="error-message" class="error"></p>
+            <div id="user-profile" class="user-profile">
+                <img id="user-avatar" class="avatar" alt="Profile Pic" />
+                <div>
+                    <h2 id="user-displayName">Display Name</h2>
+                    <p id="user-handle">Handle</p>
+                </div>
+            </div>
+            <button id="login">Login</button>
+            <button id="logout" class="hidden">Logout</button>
         </div>
     </body>
 </html>

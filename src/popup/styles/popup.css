@@ -1,14 +1,56 @@
+:root {
+    --avatar-size: 48px;
+}
+
 body {
     width: 300px;
-    padding: 10px;
-    font-family: Arial, sans-serif;
+    padding: 16px;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
 h1 {
-    font-size: 18px;
+    font-size: 16px;
     color: #333;
 }
 
-#app {
+.app {
     text-align: center;
+}
+.user-profile {
+    display: none; /* or maybe grid here too? */
+    margin-top: 16px;
+    transition: display 0.3s ease;
+    grid-template-columns: 1fr 5fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.user-profile.visible {
+    display: grid;
+}
+
+.user-profile div {
+    text-align: left;
+}
+
+.user-profile #user-displayName {
+    font-size: 1.4em;
+    margin: 0;
+}
+
+.user-profile #user-handle {
+    font-size: 1em;
+    margin: 4px 0 0 0;
+}
+
+.avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: 50%;
+}
+.error {
+    color: #dc2626;
+}
+.hidden {
+    display: none;
 }
