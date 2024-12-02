@@ -1,64 +1,131 @@
-function addCreateListButton() {
-    const followAllButton = document.querySelector('button[aria-label="Follow all"]');
-
-    if (followAllButton) {
-        const createListButton = document.createElement('button');
-        // Copy styles from Follow All button
-        createListButton.style.cssText = followAllButton.style.cssText;
-        createListButton.setAttribute('aria-label', 'Create list');
-        createListButton.setAttribute('aria-pressed', 'false');
-        createListButton.setAttribute('type', 'button');
-        createListButton.setAttribute('role', 'button');
-        createListButton.classList.add(...followAllButton.classList);
-
-        createListButton.style.color = '#ffffff';
-        createListButton.style.border = 'none';
-        createListButton.style.padding = '9px 12px';
-        createListButton.style.gap = '6px';
-        createListButton.style.borderRadius = '6px';
-        createListButton.style.cursor = 'pointer';
-        createListButton.style.fontWeight = '600';
-
-        // Add an event listener to perform action when the new button is clicked
-        createListButton.addEventListener('click', () => {
-            chrome.runtime.sendMessage({ action: 'createList' });
+class DOMUtils {
+    static createElement(tag, attributes = {}, styles = {}) {
+        const element = document.createElement(tag);
+        Object.entries(attributes).forEach(([key, value]) => {
+            element.setAttribute(key, value);
         });
+        Object.assign(element.style, styles);
+        return element;
+    }
 
-        // Copy inner content from Follow All button
-        createListButton.innerHTML = followAllButton.innerHTML;
-        const createListButtonDiv = createListButton.querySelector('div');
-        createListButtonDiv.textContent = 'Create list';
-
-        // Insert the "Create list" button before "Follow all"
-        followAllButton.parentNode.insertBefore(createListButton, followAllButton);
+    static addStyles(element, sourceElement) {
+        element.style.cssText = sourceElement.style.cssText;
+        element.classList.add(...sourceElement.classList);
     }
 }
 
-function waitForContent() {
-    return new Promise((resolve) => {
-        // First wait for page load
-        if (document.readyState === 'complete') {
-            checkForContent();
-        } else {
-            window.addEventListener('load', checkForContent);
+class ContentScript {
+    constructor() {
+        this.observer = null;
+        this.observerConfig = {
+            childList: true,
+            subtree: true,
+        };
+    }
+
+    init() {
+        this.setupNavigationListener();
+        this.waitForContent();
+    }
+
+    createListButton(followAllButton) {
+        try {
+            const createListButton = DOMUtils.createElement('button', {
+                'aria-label': 'Create list',
+                'aria-pressed': 'false',
+                type: 'button',
+                role: 'button',
+            });
+
+            DOMUtils.addStyles(createListButton, followAllButton);
+
+            Object.assign(createListButton.style, {
+                color: '#ffffff',
+                border: 'none',
+                padding: '9px 12px',
+                gap: '6px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+            });
+
+            createListButton.addEventListener('click', () => {
+                chrome.runtime.sendMessage({ action: 'createList' }, (response) => {
+                    console.log('[ContentScript] Create list response:', response);
+                });
+            });
+
+            createListButton.innerHTML = followAllButton.innerHTML;
+            const createListButtonDiv = createListButton.querySelector('div');
+            createListButtonDiv.textContent = 'Create list';
+
+            return createListButton;
+        } catch (error) {
+            console.error('[ContentScript] Failed to create list button:', error);
+            return null;
+        }
+    }
+
+    setupNavigationListener() {
+        window.addEventListener('popstate', () => this.checkForContent());
+        this.interceptHistoryMethods();
+    }
+
+    interceptHistoryMethods() {
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+
+        history.pushState = (...args) => {
+            originalPushState.apply(history, args);
+            this.checkForContent();
+        };
+
+        history.replaceState = (...args) => {
+            originalReplaceState.apply(history, args);
+            this.checkForContent();
+        };
+    }
+
+    checkForContent() {
+        if (this.observer) {
+            this.observer.disconnect();
         }
 
-        function checkForContent() {
-            const observer = new MutationObserver((mutations, obs) => {
-                const followAllButton = document.querySelector('button[aria-label="Follow all"]');
-                if (followAllButton) {
-                    addCreateListButton();
-                    obs.disconnect();
-                    resolve();
+        this.observer = new MutationObserver((mutations, obs) => {
+            const createListButton = document.querySelector('button[aria-label="Create list"]');
+            if (createListButton) {
+                obs.disconnect();
+                return;
+            }
+
+            const followAllButton = document.querySelector('button[aria-label="Follow all"]');
+            if (followAllButton) {
+                const newButton = this.createListButton(followAllButton);
+                if (newButton) {
+                    followAllButton.parentNode.insertBefore(newButton, followAllButton);
                 }
-            });
+                obs.disconnect();
+            }
+        });
 
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-            });
+        this.observer.observe(document.body, this.observerConfig);
+    }
+
+    waitForContent() {
+        if (document.readyState === 'complete') {
+            this.checkForContent();
+        } else {
+            window.addEventListener('load', () => this.checkForContent());
         }
-    });
+    }
+
+    cleanup() {
+        if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
+        }
+    }
 }
 
-waitForContent();
+const contentScript = new ContentScript();
+contentScript.init();

@@ -32,12 +32,13 @@ function hideProfile(errorMessage) {
 }
 
 function processSessionStatusMessage(message) {
-    console.log('Processing session-status message:', message);
     if (!message) {
         throw new Error('[Process Session Status] Undefined message!');
     }
-    if (message?.authenticated) {
-        showProfile(message.profile);
+    console.log('Processing session-status message:', message);
+    const { profile } = message.data;
+    if (message.success) {
+        showProfile(profile);
     } else {
         hideProfile(message.error);
     }
